@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "appewall",
+    "appewall": "appewall"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}
