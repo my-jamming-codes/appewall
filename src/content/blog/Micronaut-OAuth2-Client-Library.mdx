@@ -1,34 +1,69 @@
 ---
-heroImage: /src/assets/images/authz.webp
-category: Micronaut
-description: 'Micronaut OAuth2 Client: Simplifying Secure API Integrations'
+heroImage: /src/assets/images/automation.webp
+category: Java
+description: 'Java Annotation Processors'
 pubDate: 2024-05-18T18:30:00.000Z
 draft: false
 tags:
-  - oauth2
-  - authz
-title: Micronaut OAuth2 Client Library
+  - annotations
+  - java
+title: Annotation Processors
 ---
 
-**This Java library aims to address specific needs in OAuth validation and integration within the Micronaut framework.**
+**This article demonstrates how to use google auto library to generate methods at compile time using
+java annotation processors**
 
-## OAuth2 Client Library
+## Google Auto Library
 
-- Simplify OAuth2 client implementation for Micronaut applications
-- Provide pre-built configurations and utilities to handle common OAuth2 flows (Authorization Code, Client Credentials, etc.).
+- Add dependency
 
-## OAuth2 Resource Server Library
+```xml
+<dependency>
+    <groupId>com.google.auto.service</groupId>
+    <artifactId>auto-service</artifactId>
+    <version>1.0-rc7</version>
+    <scope>provided</scope>
+</dependency>
+```
 
-- Provide a streamlined way to set up OAuth2 resource servers with Micronaut, including token validation, scopes, and permissions handling.
+## Write an annotation processor
 
-## JWT OAuth2 Validator
+- Loggable annotation processor
 
-- Handle JWT token validation for OAuth2, including verifying signatures, expiration, and scopes.
+```java
+---
+---
+package com.example;
 
-## OAuth2 Scopes Manager
+import com.google.auto.service.AutoService;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.RoundEnvironment;
 
-- Manage and enforce OAuth2 scopes and permissions within Micronaut applications, providing a flexible way to define and check scopes for different endpoints.
+@AutoService(Processor.class)
+public class LoggableProcessor extends AbstractProcessor {
+    @Override
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        // Implement your annotation processing logic here
+        return false;
+    }
+}
 
-## OAuth2 Integrations
+```
 
-- A collection of integrations for popular OAuth2 providers (e.g., Google, Facebook, GitHub) with easy setup and configuration.
+## Include the annotation processor in the build
+
+- Add the annotation processor to the `META-INF/services/javax.annotation.processing.Processor` file
+
+```java
+
+com.example.LoggableProcessor
+```
+
+## Conclusion
+
+- Annotation processors are a powerful tool for generating code at compile time. The Google Auto library simplifies the process of writing annotation processors by providing a convenient API for registering processors and generating code.
+
+## References
+
+- [Google Auto Library]
+- [Java Annotation Processors]
