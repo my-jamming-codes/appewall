@@ -11,11 +11,11 @@ title: Go Facts 1
 
 ## package main
 
-1. The package main is a special package in Go that tells the Go compiler that this is the main package for your program.
-2. The package main is required for any Go program that you want to run as an executable.
-3. The package main must contain a func main() function, which is the entry point for your Go program.
-4. The package main is where you put the code you want to run when your program starts.
-5. The package main is the only package that can contain the func main() function.
+1. The `package main` is a special package in Go that tells the Go compiler that this is the **main package** for your program.
+2. The `package main` is **required** for any Go program that you want to run as an executable.
+3. The `package main` must contain a `func main()` function, which is the **entry point** for your Go program.
+4. The `package main` is where you put the **code you want to run** when your program starts.
+5. The `package main` is the **only package** that can contain the `func main()` function.
 
 ```go
 // example of package main
@@ -31,15 +31,15 @@ func main() {
 
 ## Blank Identifier
 
-1. The blank identifier is a special identifier in Go that can be used to store values that you don't need.
-2. It's a way to tell Go that you don't care about the value returned by a function or assigned to a variable.
-3. The blank identifier is represented by an underscore \_.
-4. It's often used when you need to call a function that returns a value, but you don't need that value.
-5. The blank identifier can also be used to import a package solely for its side effects.
-6. This is done by importing the package with the \_ prefix.
-7. This tells Go that you don't need to use any of the package's functions or variables directly, but you still want to import it for its side effects.
-8. For example, if you want to import a package that registers itself with the database/sql package, you can use the blank identifier to import it without using any of its functions or variables.
-9. This is a common pattern in Go for packages that need to register themselves with the standard library or other packages.
+1. The **blank identifier** is a special identifier in Go that can be used to **store values that you don’t need**.
+2. It’s a way to tell Go that you **don’t care** about the value returned by a function or assigned to a variable.
+3. The **blank identifier** is represented by an **underscore `_`**.
+4. It’s often used when you need to **call a function that returns a value, but you don’t need that value**.
+5. The **blank identifier** can also be used to **import a package solely for its side effects**.
+6. This is done by importing the package with the **`_` prefix**.
+7. This tells Go that you don’t need to use any of the package’s functions or variables directly, but you still want to import it for its **side effects**.
+8. For example, if you want to import a package that registers itself with the `database/sql` package, you can use the **blank identifier** to import it without using any of its functions or variables.
+9. This is a **common pattern** in Go for packages that need to register themselves with the standard library or other packages.
 
 ```go
 // blank identifier with a function call example
@@ -59,11 +59,11 @@ import _ "github.com/go-sql-driver/mysql"
 
 ## func main()
 
-1. The main function is the entry point for your Go program.
-2. When you run your Go code, the main function is where execution begins.
-3. The main function is required in the main package.
-4. The main function takes no arguments and returns nothing.
-5. The main function is where you put the code you want to run when your program starts.
+1. The **main function** is the **entry point** for your Go program.
+2. When you run your Go code, the **main function** is where **execution begins**.
+3. The **main function** is **required** in the `main` package.
+4. The **main function** takes **no arguments** and returns **nothing**.
+5. The **main function** is where you put the **code you want to run** when your program starts.
 
 ```go
 func main() {
@@ -75,14 +75,14 @@ func main() {
 
 ## init function
 
-1. init() function is a special function in Go that is called when a package is imported.
-2. You can use the init() function to perform any initialization that needs to be done when a package is imported.
-3. The init() function is called automatically by Go when a package is imported, so you don't need to call it yourself.
-4. You can have multiple init() functions in a package, and they will be called in the order they are declared.
-5. The init() function is often used to set up global variables or perform other initialization tasks that need to be done when a package is imported.
-6. The init() function is called before the main function, so any initialization that needs to be done before the main function is called can be done in the init() function.
-7. The init() function is a good place to set up database connections, read configuration files, or perform other initialization tasks that need to be done before the main function is called.
-8. The init() function is a great way to keep your code organized and ensure that initialization tasks are done when they need to be done.
+1. **init() function** is a special function in Go that is called when a package is **imported**.
+2. You can use the **init() function** to perform any **initialization** that needs to be done when a package is imported.
+3. The **init() function** is called **automatically** by Go when a package is imported, so you don't need to call it yourself.
+4. You can have **multiple init() functions** in a package, and they will be called in the order they are declared.
+5. The **init() function** is often used to set up **global variables** or perform other initialization tasks that need to be done when a package is imported.
+6. The **init() function** is called **before the main function**, so any initialization that needs to be done before the main function is called can be done in the init() function.
+7. The **init() function** is a good place to set up **database connections**, read configuration files, or perform other initialization tasks that need to be done before the main function is called.
+8. The **init() function** is a great way to keep your code **organized** and ensure that initialization tasks are done when they need to be done.
 
 ```go
 
