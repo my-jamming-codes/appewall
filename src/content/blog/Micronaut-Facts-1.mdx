@@ -1,0 +1,381 @@
+---
+heroImage: /src/assets/images/micronaut.webp
+category: Micronaut
+description: 'Micronaut Facts 1'
+pubDate: 2024-06-26T23:23:00.000Z
+draft: false
+tags:
+  - Java
+title: Micronaut Facts 1
+---
+
+## @Around
+
+1. The `@Around` annotation is used in Micronaut to **intercept method calls**.
+2. It allows you to **execute code before and after** the method call.
+3. The `@Around` annotation is part of the **AOP (Aspect-Oriented Programming)** support in Micronaut.
+4. It’s a way to **separate cross-cutting concerns** from the main business logic of your application.
+5. The `@Around` annotation is used to **create advice** that can be applied to multiple methods in your application.
+6. It’s a powerful feature that allows you to **add behavior** to your methods without modifying their code directly.
+7. The `@Around` annotation is often used for **logging**, **security**, **transaction management**, and other cross-cutting concerns.
+8. It’s a **flexible** and **powerful** way to **enhance** the behavior of your methods without changing their implementation.
+
+```java
+// example of @Around annotation with import
+import io.micronaut.aop.Around;
+import io.micronaut.aop.InvocationContext;
+import org.slf4j.Logger;
+
+@Around
+public Object log(InvocationContext context) throws Exception {
+    // code to execute before the method call
+    log.info("Before method call: {}", context.getMethodName());
+
+    // execute the method
+    Object result = context.proceed();
+
+    // code to execute after the method call
+    log.info("After method call: {}", context.getMethodName());
+
+    return result;
+}
+```
+
+<hr />
+
+## @Singleton
+
+1. The `@Singleton` annotation is used in Micronaut to **create a singleton bean**.
+2. It’s a way to **create a single instance** of a bean that is **shared** across your application.
+3. The `@Singleton` annotation is used to **annotate classes** that you want to be **managed as singletons** by the Micronaut **IoC container**.
+4. It’s a **convenient** way to **share state** and **behavior** across your application without having to manage the lifecycle of the bean yourself.
+5. The `@Singleton` annotation is often used for **services**, **repositories**, and other **stateful components** that need to be **shared** across multiple parts of your application.
+6. It’s a **powerful** feature that allows you to **create** and **manage** singleton beans with **minimal** configuration.
+7. The `@Singleton` annotation is a **key** part of the **dependency injection** support in Micronaut.
+8. It’s a **flexible** and **easy** way to **manage** the **lifecycle** of your beans and **share** them across your application.
+
+```java
+// example of @Singleton annotation with import
+import javax.inject.Singleton;
+
+@Singleton
+public class MyService {
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Singleton annotation with constructor injection
+@Singleton
+public class MyService {
+    private final MyRepository repository;
+
+    public MyService(MyRepository repository) {
+        this.repository = repository;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Singleton annotation with field injection
+@Singleton
+public class MyService {
+    @Inject
+    private MyRepository repository;
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Singleton annotation with method injection
+@Singleton
+public class MyService {
+    private MyRepository repository;
+
+    @Inject
+    public void setRepository(MyRepository repository) {
+        this.repository = repository;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Singleton annotation with constructor injection and @Value annotation
+@Singleton
+public class MyService {
+    private final String message;
+
+    public MyService(@Value("${my.message}") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Singleton annotation with constructor injection and @ConfigurationProperties annotation
+@Singleton
+@ConfigurationProperties("my")
+public class MyService {
+    private final String message;
+
+    public MyService(@Value("${message}") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Singleton annotation with constructor injection and @Property annotation
+@Singleton
+public class MyService {
+    private final String message;
+
+    public MyService(@Property(name = "my.message") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+```
+
+<hr />
+
+## @Inject
+
+1. The `@Inject` annotation is used in Micronaut to **inject dependencies** into your beans.
+2. It’s a way to **declare** that a **field**, **constructor parameter**, or **setter method** should be **injected** by the Micronaut **IoC container**.
+3. The `@Inject` annotation is used to **annotate fields**, **constructors**, and **methods** that you want to be **injected** by Micronaut.
+4. It’s a **convenient** way to **declare** your **dependencies** and let Micronaut **manage** their **lifecycle** for you.
+5. The `@Inject` annotation is often used for **constructor injection**, **field injection**, and **method injection**.
+6. It’s a **powerful** feature that allows you to **inject** dependencies **wherever** you need them in your beans.
+7. The `@Inject` annotation is a **key** part of the **dependency injection** support in Micronaut.
+
+```java
+// example of @Inject annotation with constructor injection
+import javax.inject.Inject;
+
+public class MyService {
+    private final MyRepository repository;
+
+    @Inject
+    public MyService(MyRepository repository) {
+        this.repository = repository;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with field injection
+public class MyService {
+    @Inject
+    private MyRepository repository;
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with method injection
+public class MyService {
+    private MyRepository repository;
+
+    @Inject
+    public void setRepository(MyRepository repository) {
+        this.repository = repository;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with constructor injection and @Value annotation
+import io.micronaut.context.annotation.Value;
+
+public class MyService {
+    private final String message;
+
+    @Inject
+    public MyService(@Value("${my.message}") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with constructor injection and @ConfigurationProperties annotation
+import io.micronaut.context.annotation.ConfigurationProperties;
+
+public class MyService {
+    private final String message;
+
+    @Inject
+    public MyService(@Value("${message}") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with constructor injection and @Property annotation
+import io.micronaut.context.annotation.Property;
+
+public class MyService {
+    private final String message;
+
+    @Inject
+    public MyService(@Property(name = "my.message") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+
+// example of @Inject annotation with field injection and @Value annotation
+import io.micronaut.context.annotation.Value;
+
+public class MyService {
+    @Inject
+    @Value("${my.message}")
+    private String message;
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with field injection and @ConfigurationProperties annotation
+import io.micronaut.context.annotation.ConfigurationProperties;
+
+public class MyService {
+    @Inject
+    @ConfigurationProperties("my")
+    private MyConfiguration configuration;
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with field injection and @Property annotation
+import io.micronaut.context.annotation.Property;
+
+public class MyService {
+    @Inject
+    @Property(name = "my.message")
+    private String message;
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with method injection and @Value annotation
+import io.micronaut.context.annotation.Value;
+
+public class MyService {
+    private String message;
+
+    @Inject
+    public void setMessage(@Value("${my.message}") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Inject annotation with method injection and @ConfigurationProperties annotation
+import io.micronaut.context.annotation.ConfigurationProperties;
+
+public class MyService {
+    private MyConfiguration configuration;
+
+    @Inject
+    public void setConfiguration(@ConfigurationProperties("my") MyConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+```
+
+<hr />
+
+## @Value
+
+1. The `@Value` annotation is used in Micronaut to **inject configuration properties** into your beans.
+2. It’s a way to **inject** values from your **application configuration** into your beans.
+3. The `@Value` annotation is used to **annotate fields**, **constructors**, and **methods** that you want to be **injected** with **configuration properties**.
+4. It’s a **convenient** way to **access** configuration properties **wherever** you need them in your beans.
+5. The `@Value` annotation is often used for **injecting** **configuration properties** into your beans.
+6. It’s a **powerful** feature that allows you to **configure** your beans with **external properties**.
+7. The `@Value` annotation is a **key** part of the **configuration** support in Micronaut.
+
+```java
+// example of @Value annotation with field injection
+import io.micronaut.context.annotation.Value;
+
+public class MyService {
+    @Value("${my.message}")
+    private String message;
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Value annotation with constructor injection
+import io.micronaut.context.annotation.Value;
+
+public class MyService {
+    private final String message;
+
+    public MyService(@Value("${my.message}") String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+
+// example of @Value annotation with method injection
+import io.micronaut.context.annotation.Value;
+
+public class MyService {
+    private String message;
+
+    @Value("${my.message}")
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void doSomething() {
+        // code to do something
+    }
+}
+```
