@@ -1,11 +1,11 @@
 ---
 heroImage: /src/assets/images/dp.jpeg
-category: Dynamic Programming
+category: Data Structures
 description: 'Dynamic Programming Facts 1'
 pubDate: 2024-06-26T23:23:00.000Z
 draft: false
 tags:
-  - Data Structures
+  - Dynamic Programming
 title: Dynamic Programming Facts 1
 ---
 
@@ -27,7 +27,10 @@ def rod_cutting(n, prices):
     return dp[n]
 ```
 
-![Rod Cutting - Dynamic Programming](/src/assets/images/cut.png)
+import { Image } from 'astro:assets'
+import cut from '/src/assets/images/cut.png'
+
+<Image src={cut} alt='Rod Cutting - Dynamic Programming' />
 
 <hr />
 
@@ -53,6 +56,8 @@ def longest_palindromic_subsequence(s):
     return dp[0][n - 1]
 ```
 
-![Longest Common Subsequence](/src/assets/images/longest-palindromic.png)
+import longest from '/src/assets/images/longest-palindromic.png'
+
+<Image src={longest} alt='Longest Common Subsequence' />
 
 <hr />
