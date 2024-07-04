@@ -1,5 +1,5 @@
 ---
-heroImage: /src/assets/images/dp.jpeg
+heroImage: /src/assets/images/dp-facts/dp.jpeg
 category: Data Structures
 description: 'Dynamic Programming Facts 1'
 pubDate: 2024-06-26T23:23:00.000Z
@@ -11,12 +11,28 @@ title: Dynamic Programming Facts 1
 
 ## Rod Cutting Problem
 
-**Problem**: Given a rod of length n inches and an array of prices that contains prices of all pieces of size smaller than n.
-Determine the maximum value obtainable by cutting up the rod and selling the pieces.
+**Problem**:
 
-**Example**: - Input: - Length of rod: 8 - Prices: [1, 5, 8, 9, 10, 17, 17, 20] - Output: 22 - Explanation: - The maximum obtainable value is by cutting the rod into two pieces of length 2 and 6. - The price of the two pieces is 5 + 17 = 22.
+```html
+Given a rod of length n inches and an array of prices that contains prices of all pieces of size
+smaller than n. Determine the maximum value obtainable by cutting up the rod and selling the pieces.
+```
 
-**Complexity Analysis**: - Time Complexity: O(n^2) - Space Complexity: O(n)
+**Example**: -
+
+```html
+Input: Length of rod: 8 Prices: [1, 5, 8, 9, 10, 17, 17, 20] Output: 22 Explanation: - The maximum
+obtainable value is by cutting the rod into two pieces of length 2 and 6. The price of the two
+pieces is 5 + 17 = 22.
+```
+
+**Complexity Analysis**: -
+
+```html
+Time Complexity: O(n^2) Space Complexity: O(n)
+```
+
+**Solution**:-
 
 ```python
 def rod_cutting(n, prices):
@@ -28,7 +44,7 @@ def rod_cutting(n, prices):
 ```
 
 import { Image } from 'astro:assets'
-import cut from '/src/assets/images/cut.png'
+import cut from '/src/assets/images/dp-facts/cut.png'
 
 <Image src={cut} alt='Rod Cutting - Dynamic Programming' />
 
@@ -36,11 +52,25 @@ import cut from '/src/assets/images/cut.png'
 
 ## Longest Common Subsequence
 
-**Problem**: Given a string, find the length of the longest palindromic subsequence.
+**Problem**:
 
-**Example**: - Input: "bbbab" - Output: 4 - Explanation: The longest palindromic subsequence is "bbbb".
+```html
+Given a string, find the length of the longest palindromic subsequence.
+```
 
-**Complexity Analysis**: - Time Complexity: O(n^2) - Space Complexity: O(n^2)
+**Example**:
+
+```html
+Input: "bbbab" Output: 4 Explanation: The longest palindromic subsequence is "bbbb".
+```
+
+**Complexity Analysis**:
+
+```html
+Time Complexity: O(n^2) Space Complexity: O(n^2)
+```
+
+**Solution**:
 
 ```python
 def longest_palindromic_subsequence(s):
@@ -56,7 +86,7 @@ def longest_palindromic_subsequence(s):
     return dp[0][n - 1]
 ```
 
-import longest from '/src/assets/images/longest-palindromic.png'
+import longest from '/src/assets/images/dp-facts/longest-palindromic.png'
 
 <Image src={longest} alt='Longest Common Subsequence' />
 
