@@ -1,0 +1,119 @@
+---
+heroImage: /src/assets/images/dp-facts/dp.jpeg
+category: Data Structures
+description: 'Dynamic Programming Facts 2'
+pubDate: 2024-07-05T23:23:00.000Z
+draft: false
+tags:
+  - Dynamic Programming
+title: Dynamic Programming Facts 2
+---
+
+## Dice Throw Problem
+
+**Problem:**
+
+```html
+Given `n` dice each with `m` faces, numbered from `1` to `m`, find the number of ways to get a sum
+`X`. X is the summation of values on each face when all the dice are thrown.
+```
+
+**Example:**
+
+```html
+Input: n = 3, m = 6, X = 8 Output: 21
+```
+
+**Explanation:**
+
+```html
+The number of ways to get a sum of `8` with `3` dice having `6` faces each are `21`. The following
+are the possible outcomes: (2, 3, 3) (3, 2, 3) (3, 3, 2) (2, 2, 4) (2, 4, 2) (4, 2, 2) (1, 3, 4) (1,
+4, 3) (3, 1, 4) (3, 4, 1) (4, 1, 3) (4, 3, 1) (1, 2, 5) (1, 5, 2) (2, 1, 5) (2, 5, 1) (5, 1, 2) (5,
+2, 1) (1, 1, 6) (1, 6, 1) (6, 1, 1)
+```
+
+**Complexity Analysis:**
+
+```html
+Time Complexity: O(n * m * x) Space Complexity: O(n * x)
+```
+
+**Solution:-**
+
+```python
+def dice_throw(n, m, x):
+    dp = [[0] * (x + 1) for _ in range(n + 1)]
+    for j in range(1, min(m, x) + 1):
+        dp[1][j] = 1
+    for i in range(2, n + 1):
+        for j in range(1, x + 1):
+            for k in range(1, min(m, j) + 1):
+                dp[i][j] += dp[i - 1][j - k]
+    return dp[n][x]
+```
+
+import { Image } from 'astro:assets'
+import dice from '/src/assets/images/dp-facts/dice_sum.png'
+
+<Image src={dice} alt='Dice Throw - Dynamic Programming' />
+
+<hr />
+
+## Optimal Binary Search Tree
+
+**Problem:**
+
+```html
+Given a sorted array of keys, construct a height-balanced binary search tree using the keys such
+that the total cost of searching all keys is minimized. The cost of searching for a key is the depth
+of the key in the binary search tree. The frequency of each key is given in an array. Find the
+minimum total cost of searching all keys.
+```
+
+**Example:**
+
+```html
+Input: keys = [10, 12, 20] freq = [34, 8, 50] Output: 142
+```
+
+**Explanation:**
+
+```html
+The keys are [10, 12, 20] and their corresponding frequencies are [34, 8, 50]. Our aim is to build a
+binary search tree with these keys such that the cost of searching all keys is minimized. The cost
+of searching a key is the total number of nodes encountered while reaching the node from the root,
+including the node itself (assuming that the root level is 1). Therefore, commonly searched items
+should be brought closer to the root to reduce the overall search cost.
+```
+
+**Complexity Analysis:**
+
+```html
+Time Complexity: O(n^3) Space Complexity: O(n^2)
+```
+
+**Solution**:
+
+```python
+def optimal_bst(keys, freq):
+    n = len(keys)
+    dp = [[0] * n for _ in range(n)]
+    for i in range(n):
+        dp[i][i] = freq[i]
+    for l in range(2, n + 1):
+        for i in range(n - l + 1):
+            j = i + l - 1
+            dp[i][j] = float('inf')
+            for k in range(i, j + 1):
+                left = dp[i][k - 1] if k > i else 0
+                right = dp[k + 1][j] if k < j else 0
+                dp[i][j] = min(dp[i][j], left + right + sum(freq[i:j + 1]))
+    return dp[0][n - 1]
+```
+
+import bst from '/src/assets/images/dp-facts/optimalbst.png'
+
+<Image src={bst} alt='Optimal Binary Search Tree - Dynamic Programming' />
+
+<hr />
