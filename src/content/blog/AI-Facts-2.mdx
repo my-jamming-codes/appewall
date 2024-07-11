@@ -1,0 +1,124 @@
+---
+heroImage: /src/assets/images/ai-facts/automation.webp
+category: AI
+description: 'AI Facts 2'
+pubDate: 2024-07-12T23:23:00.000Z
+draft: false
+tags:
+  - Algorithms
+title: AI Facts 2
+---
+
+## Personalized PageRank
+
+1. Personalized PageRank is an extension of the classic PageRank algorithm that takes into account a user's preferences when ranking web pages.
+2. The algorithm works by iteratively propagating the user's preferences through the web graph, assigning higher scores to pages that are more relevant to the user.
+3. Personalized PageRank is commonly used in recommendation systems to provide personalized recommendations to users based on their browsing history or preferences.
+
+```python
+import networkx as nx
+
+# Create a directed graph
+G = nx.DiGraph()
+
+# Add edges to the graph
+G.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 1)])
+
+# Compute the Personalized PageRank
+pr = nx.pagerank(G, personalization={1: 1, 2: 0, 3: 0, 4: 0})
+
+print(pr)
+```
+
+## ADMM (Alternating Direction Method of Multipliers)
+
+1. ADMM is an optimization algorithm that is used to solve convex optimization problems with separable objective functions and constraints.
+2. The algorithm works by decomposing the original problem into smaller subproblems, which are then solved iteratively using a combination of gradient descent and dual ascent.
+3. ADMM is particularly useful for problems with large-scale data or high-dimensional feature spaces, as it can be parallelized and distributed across multiple processors.
+
+```python
+import numpy as np
+from scipy.optimize import minimize
+
+# Define the objective function
+def objective(x):
+    return x[0]**2 + x[1]**2
+
+# Define the constraints
+def constraint(x):
+    return x[0] + x[1] - 1
+
+# Define the initial guess
+x0 = np.array([0, 0])
+
+# Solve the optimization problem using ADMM
+res = minimize(objective, x0, constraints={'type': 'eq', 'fun': constraint})
+
+print(res.x)
+```
+
+## Primal-dual optimization
+
+1. Primal-dual optimization is a class of optimization algorithms that are used to solve convex optimization problems with both primal and dual variables.
+2. The algorithm works by iteratively updating the primal and dual variables to minimize the Lagrangian function, which is a combination of the objective function and the constraints.
+3. Primal-dual optimization is particularly useful for problems with complex constraints or non-smooth objective functions, as it can handle a wide range of optimization problems efficiently.
+
+```python
+import numpy as np
+from scipy.optimize import minimize
+
+# Define the objective function
+def objective(x):
+    return x[0]**2 + x[1]**2
+
+# Define the constraints
+def constraint(x):
+    return x[0] + x[1] - 1
+
+# Define the initial guess
+x0 = np.array([0, 0])
+
+# Solve the optimization problem using Primal-dual optimization
+res = minimize(objective, x0, constraints={'type': 'eq', 'fun': constraint}, method='SLSQP')
+
+print(res.x)
+```
+
+## EVD (Eigenvalue Decomposition)
+
+1. Eigenvalue decomposition (EVD) is a matrix factorization technique that decomposes a square matrix into its eigenvectors and eigenvalues.
+2. The algorithm works by finding the eigenvectors of the matrix, which are the directions along which the matrix scales when multiplied by a scalar.
+3. EVD is commonly used in machine learning algorithms such as PCA (Principal Component Analysis) and spectral clustering to reduce the dimensionality of the data and identify patterns in the data.
+
+```python
+import numpy as np
+
+# Generate a random matrix
+A = np.random.rand(3, 3)
+
+# Compute the Eigenvalue Decomposition
+eigenvalues, eigenvectors = np.linalg.eig(A)
+
+print(eigenvalues)
+print(eigenvectors)
+```
+
+## SVD (Singular Value Decomposition)
+
+1. Singular Value Decomposition (SVD) is a matrix factorization technique that decomposes a matrix into three matrices: U, Σ, and V.
+2. The algorithm works by finding the singular values of the matrix, which are the square roots of the eigenvalues of the matrix's covariance matrix.
+3. SVD is commonly used in machine learning algorithms such as matrix factorization, image compression, and collaborative filtering to reduce the dimensionality of the data and identify latent features.
+
+```python
+import numpy as np
+
+# Generate a random matrix
+A = np.random.rand(3, 3)
+
+# Compute the Singular Value Decomposition
+U, S, V = np.linalg.svd(A)
+
+print(U)
+print(S)
+print(V)
+```
