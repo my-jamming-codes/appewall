@@ -29,17 +29,15 @@ If a weight has a large positive gradient, increasing it would increase the loss
 
 ## Core Equation
 
-For each parameter $w$:
+For each parameter `w`:
 
-$$
-w \leftarrow w - \eta \frac{\partial L}{\partial w}
-$$
+`w <- w - η * (∂L/∂w)`
 
 Where:
 
-- $\eta$ is the learning rate
-- $L$ is the loss function
-- $\frac{\partial L}{\partial w}$ is the gradient
+- `η` is the learning rate
+- `L` is the loss function
+- `∂L/∂w` is the gradient
 
 ## Intuition
 
