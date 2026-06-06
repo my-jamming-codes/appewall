@@ -5,4 +5,4 @@ allowBuilds:
   better-sqlite3: false
   esbuild: true
   sharp: true
-  yarn: true
+  yarn: false
