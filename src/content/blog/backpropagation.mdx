@@ -1,0 +1,52 @@
+---
+heroImage: /src/assets/images/banner.jpg
+category: AI
+description: 'A beginner-friendly guide to backpropagation in neural networks.'
+pubDate: 2026-06-06T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Backpropagation
+title: Understanding Backpropagation
+---
+
+## What Is Backpropagation?
+
+Backpropagation is the learning algorithm used to train most neural networks. It tells the model how to adjust each weight to reduce prediction error.
+
+At a high level, training repeats this loop:
+
+1. Forward pass: compute the prediction.
+2. Loss calculation: measure how wrong the prediction is.
+3. Backward pass: compute gradients of the loss with respect to each weight.
+4. Update step: move weights in the direction that reduces loss.
+
+## Why It Works
+
+Backpropagation uses the chain rule from calculus to propagate error signals from the output layer back through hidden layers.
+
+If a weight has a large positive gradient, increasing it would increase the loss, so optimization algorithms (like SGD or Adam) decrease that weight.
+
+## Core Equation
+
+For each parameter $w$:
+
+$$
+w \leftarrow w - \eta \frac{\partial L}{\partial w}
+$$
+
+Where:
+
+- $\eta$ is the learning rate
+- $L$ is the loss function
+- $\frac{\partial L}{\partial w}$ is the gradient
+
+## Intuition
+
+Think of backpropagation as giving each parameter “credit or blame” for the final error. Parameters that contributed to mistakes are adjusted more.
+
+## Practical Notes
+
+- Very deep networks can suffer from vanishing or exploding gradients.
+- Good initialization, normalization, and activation choices help.
+- Learning rate tuning often matters more than model size early on.
