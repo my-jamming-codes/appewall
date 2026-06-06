@@ -1,4 +1,6 @@
 import { defineConfig } from 'astro/config'
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import tailwind from '@astrojs/tailwind'
@@ -13,7 +15,9 @@ export default defineConfig({
 		shikiConfig: {
 			theme: 'material-theme-palenight',
 			wrap: true
-		}
+		},
+		remarkPlugins: [remarkMath],
+        rehypePlugins: [rehypeKatex]
 	},
 	integrations: [
 		mdx({
