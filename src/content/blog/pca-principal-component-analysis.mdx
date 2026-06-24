@@ -1,0 +1,144 @@
+---
+heroImage: https://picsum.photos/seed/pca-principal-components/1200/630
+category: AI
+description: 'A practical introduction to PCA: intuition, math, explained variance, and a scikit-learn example.'
+pubDate: 2026-06-24T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - PCA
+  - Dimensionality Reduction
+title: PCA (Principal Component Analysis) Explained
+---
+
+## What Is PCA?
+
+Principal Component Analysis (PCA) is a dimensionality reduction technique.
+
+It transforms a dataset with many correlated features into a smaller set of new features called principal components, while keeping as much information (variance) as possible.
+
+In simple terms, PCA helps you:
+
+- Compress data with minimal information loss.
+- Visualize high-dimensional data in 2D or 3D.
+- Reduce noise and multicollinearity before modeling.
+
+## Core Intuition
+
+Imagine your data points form an elongated cloud.
+
+- The first principal component points in the direction of maximum spread.
+- The second principal component is perpendicular to the first and captures the next highest spread.
+- Each next component is orthogonal to all previous ones and captures the remaining variance.
+
+So PCA rotates the coordinate system to align with the directions where data varies most.
+
+## PCA In Math (Short Version)
+
+Given centered data matrix $X$:
+
+1. Compute covariance matrix:
+
+$$
+\Sigma = \frac{1}{n-1}X^TX
+$$
+
+2. Compute eigenvalues and eigenvectors of $\Sigma$.
+
+- Eigenvectors = principal directions.
+- Eigenvalues = variance captured by each direction.
+
+3. Sort eigenvectors by descending eigenvalues.
+
+4. Keep the first $k$ components and project:
+
+$$
+Z = XW_k
+$$
+
+Where $W_k$ contains the top-$k$ eigenvectors.
+
+## Why Feature Scaling Matters
+
+PCA is variance-based.
+
+If one feature has a much larger scale than others, it can dominate the principal components.
+
+That is why standardization is usually done first:
+
+$$
+x' = \frac{x-\mu}{\sigma}
+$$
+
+## Explained Variance
+
+Explained variance ratio tells you how much total variance each component captures.
+
+If the first two components explain 92% variance, reducing to 2D likely preserves most structure.
+
+A common workflow:
+
+1. Fit PCA with all components.
+2. Plot cumulative explained variance.
+3. Choose the smallest $k$ that reaches a target (for example, 95%).
+
+## Practical Example (scikit-learn)
+
+```python
+import numpy as np
+from sklearn.datasets import load_wine
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# 1) Load dataset
+X, y = load_wine(return_X_y=True)
+
+# 2) Standardize features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 3) Fit PCA (all components) to inspect explained variance
+pca_full = PCA()
+pca_full.fit(X_scaled)
+
+cum_var = np.cumsum(pca_full.explained_variance_ratio_)
+print('Cumulative explained variance by component:')
+for i, v in enumerate(cum_var, start=1):
+    print(f'PC{i:>2}: {v:.4f}')
+
+# 4) Keep only 2 components for visualization/compression
+pca_2 = PCA(n_components=2)
+X_2d = pca_2.fit_transform(X_scaled)
+
+print('\nOriginal shape:', X.shape)
+print('Reduced shape :', X_2d.shape)
+print('Explained variance (2 PCs):', pca_2.explained_variance_ratio_)
+print('Total explained variance:', pca_2.explained_variance_ratio_.sum())
+```
+
+## Interpreting PCA Output
+
+- `components_`: directions of principal axes.
+- `explained_variance_`: absolute variance per component.
+- `explained_variance_ratio_`: percentage of total variance per component.
+- `transform(X)`: data represented in the new PCA space.
+
+## Benefits
+
+- Faster training with fewer features.
+- Lower storage and simpler visualization.
+- Can improve downstream models by reducing redundant features.
+
+## Limitations
+
+- Components are linear combinations, so interpretability can drop.
+- PCA is linear, so it may miss nonlinear structure.
+- Sensitive to outliers unless preprocessed.
+
+## When To Use PCA
+
+Use PCA when you have many numeric, correlated features and want a compact representation.
+
+It is especially useful in preprocessing pipelines before clustering, anomaly detection, or classical ML models.
+
+For nonlinear patterns, consider methods like t-SNE or UMAP for visualization, or kernel PCA for nonlinear projections.
