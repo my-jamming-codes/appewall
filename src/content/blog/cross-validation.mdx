@@ -1,0 +1,76 @@
+---
+heroImage: https://picsum.photos/seed/cross-validation/1200/630
+category: AI
+description: 'A practical guide to cross validation, why it matters, and how to choose the right strategy.'
+pubDate: 2026-06-24T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Cross Validation
+  - Model Evaluation
+title: Cross Validation in Machine Learning
+---
+
+## Why Cross Validation Exists
+
+When you evaluate a model on a single train-test split, your result can depend heavily on which examples happened to land in each split.
+
+Cross validation reduces that randomness by testing the model on multiple folds.
+
+## How It Works
+
+In $k$-fold cross validation, the dataset is split into $k$ parts.
+
+For each round:
+
+1. Train on $k-1$ folds.
+2. Validate on the remaining fold.
+3. Repeat until every fold has been used once as validation.
+
+The final score is usually the average of the fold scores.
+
+## Why It Is Useful
+
+Cross validation gives a more reliable estimate of generalization performance than a single split.
+
+It is especially helpful when data is limited and you want to use as much of it as possible for both training and evaluation.
+
+## Common Variants
+
+Different problems need different splitting strategies.
+
+- Stratified $k$-fold keeps class ratios stable in classification tasks.
+- Time series split preserves ordering for temporal data.
+- Grouped cross validation keeps related samples in the same fold.
+
+These variants matter because leakage can make a model look better than it really is.
+
+## Example Workflow
+
+A standard workflow is:
+
+1. Reserve a final test set once.
+2. Use cross validation on the training portion.
+3. Tune hyperparameters using the cross validation results.
+4. Evaluate once on the untouched test set.
+
+That sequence helps avoid overly optimistic conclusions.
+
+## Cross Validation And Overfitting
+
+Cross validation does not prevent overfitting by itself.
+
+What it does do is reveal overfitting more clearly. If performance is strong on training folds but weak or unstable across validation folds, the model may be too complex or the features may be noisy.
+
+## Practical Tips
+
+- Use stratification for imbalanced classification problems.
+- Keep preprocessing inside the cross validation pipeline to prevent leakage.
+- Use grouped splits when one entity appears multiple times.
+- For time series, never shuffle future information into the past.
+
+## Takeaway
+
+Cross validation is one of the most reliable tools for model evaluation.
+
+It gives a better estimate of real-world performance and helps you make decisions based on stable evidence rather than a lucky split.

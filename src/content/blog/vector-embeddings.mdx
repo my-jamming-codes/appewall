@@ -1,0 +1,91 @@
+---
+heroImage: https://picsum.photos/seed/vector-embeddings/1200/630
+category: AI
+description: 'An accessible explanation of vector embeddings, similarity search, and why embeddings are useful.'
+pubDate: 2026-06-24T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Embeddings
+  - Vector Search
+title: Vector Embeddings Explained
+---
+
+## What Is An Embedding?
+
+A vector embedding is a numeric representation of an item such as a word, sentence, image, or user profile.
+
+The goal is to place similar items near each other in a vector space.
+
+For example, words like "king" and "queen" should end up closer together than "king" and "bicycle".
+
+## Why Embeddings Are Useful
+
+Embeddings turn messy real-world objects into vectors that machine learning models can compare, search, and cluster.
+
+They are useful for:
+
+- Semantic search.
+- Recommendation systems.
+- Clustering similar items.
+- Retrieval-augmented generation.
+- Duplicate detection.
+
+## Similarity In Vector Space
+
+Once objects are embedded, we can measure similarity mathematically.
+
+Common choices include cosine similarity and Euclidean distance.
+
+Cosine similarity compares direction rather than raw magnitude:
+
+$$
+\cos(\theta) = \frac{a \cdot b}{\|a\|\|b\|}
+$$
+
+If two vectors point in a similar direction, they likely represent related meanings.
+
+## How Embeddings Are Learned
+
+Embeddings are usually learned during training.
+
+The model is optimized so that items with similar context or behavior produce similar vectors.
+
+Examples:
+
+- Word embeddings learn from neighboring words.
+- Sentence embeddings learn from semantic similarity.
+- Image embeddings learn from visual structure.
+- Recommendation embeddings learn from user-item interactions.
+
+## Why High Dimensions Help
+
+Embedding spaces often have dozens, hundreds, or even thousands of dimensions.
+
+That sounds large, but extra dimensions give the model more room to encode nuanced relationships. The key is not human interpretability, but utility for downstream tasks.
+
+## A Simple Mental Model
+
+Think of embeddings as coordinates on a map.
+
+Nearby points represent related items. Far-apart points represent items with less in common.
+
+That geometric view is what makes embeddings powerful for retrieval and comparison.
+
+## Practical Example
+
+If a search query and a document are both embedded into the same space, the most relevant documents are often the ones with the closest vectors to the query.
+
+That is the basic idea behind modern semantic search systems.
+
+## Limitations
+
+- Embeddings can encode bias from training data.
+- Similarity depends on the model and domain.
+- A vector that looks close mathematically may still be wrong semantically in edge cases.
+
+## Takeaway
+
+Vector embeddings convert meaning into geometry.
+
+Once data becomes vectors, many problems become easier to solve with distance, clustering, and nearest-neighbor search.

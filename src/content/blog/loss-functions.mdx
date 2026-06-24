@@ -1,0 +1,87 @@
+---
+heroImage: https://picsum.photos/seed/loss-functions/1200/630
+category: AI
+description: 'A clear introduction to loss functions and how they guide model training.'
+pubDate: 2026-06-24T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Loss Functions
+  - Optimization
+title: Loss Functions in Machine Learning
+---
+
+## What A Loss Function Does
+
+A loss function measures how far a model’s prediction is from the true target.
+
+Training algorithms use this value to decide how to update the model.
+
+If the loss is high, the prediction is poor. If the loss is low, the prediction is closer to the truth.
+
+## Why Loss Functions Matter
+
+The loss function is the signal that drives learning.
+
+Backpropagation computes gradients of the loss, and the optimizer uses those gradients to update the model parameters.
+
+In other words, the loss is the bridge between prediction quality and weight updates.
+
+## Regression Losses
+
+For regression tasks, common choices include mean squared error and mean absolute error.
+
+Mean squared error is:
+
+$$
+\text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2
+$$
+
+It penalizes large errors strongly.
+
+Mean absolute error is:
+
+$$
+\text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|y_i - \hat{y}_i|
+$$
+
+It is more robust to outliers than MSE.
+
+## Classification Losses
+
+For classification, common loss functions include binary cross entropy and categorical cross entropy.
+
+Binary cross entropy is often used for two-class problems. It compares predicted probabilities with the true labels and rewards confident correct predictions.
+
+Cross entropy is popular because it works naturally with probabilistic outputs.
+
+## Why Accuracy Is Not Enough
+
+Accuracy can hide important details.
+
+A model might be accurate on a balanced dataset while still being poor at ranking probabilities or handling class imbalance.
+
+Loss functions provide richer training feedback than simple metrics because they work on every example and every probability.
+
+## Choosing The Right Loss
+
+The task should guide the loss choice:
+
+- Use MSE or MAE for continuous targets.
+- Use binary cross entropy for binary classification.
+- Use categorical cross entropy for multi-class classification.
+- Use task-specific losses for ranking, segmentation, or detection.
+
+## Surrogate Losses
+
+Sometimes the best training objective is not the same as the final business metric.
+
+In those cases, we use a surrogate loss that is easier to optimize but still correlates with the real goal.
+
+That is why loss design is such an important part of machine learning engineering.
+
+## Takeaway
+
+Loss functions tell a model what "wrong" means.
+
+Pick the wrong loss and the model may learn the wrong behavior. Pick the right one and the optimizer has a clear target to improve.
