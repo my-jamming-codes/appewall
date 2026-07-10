@@ -1,0 +1,197 @@
+---
+heroImage: /src/assets/images/banner.jpg
+category: AI
+description: A practical deep dive into IVF indexing for approximate nearest neighbor search, including a fully worked numeric example and tuning guidance.
+pubDate: 2026-07-10T09:00:00.000Z
+draft: false
+tags:
+  - AI
+  - ANN
+  - Vector Search
+  - IVF
+title: IVF for Vector Search: Theory, Intuition, and Worked Example
+---
+
+Approximate nearest neighbor (ANN) search is the backbone of modern retrieval systems for semantic search, recommendations, and RAG pipelines. When your dataset grows from thousands to millions of vectors, brute-force comparison becomes expensive.
+
+In this post, we focus on **IVF (Inverted File Index)**, one of the most common ANN indexing ideas. We will cover:
+
+1. Why IVF exists
+2. How IVF works step by step
+3. A worked toy example with explicit distances
+4. Tuning knobs and trade-offs
+5. Practical recommendations
+
+## Why IVF?
+
+Suppose you have $N$ vectors, each of dimension $d$. Exact search checks distance from a query to all vectors:
+
+$$
+\text{cost} \approx O(Nd)
+$$
+
+This is accurate, but slow at scale.
+
+IVF reduces work by first grouping vectors into clusters, then searching only a small subset of those clusters at query time.
+
+Core intuition:
+
+- Partition the space into regions.
+- Route query to the most promising regions.
+- Compare only against vectors in those regions.
+
+## IVF Build Phase
+
+IVF usually uses k-means to create coarse clusters (often called coarse quantizer centroids).
+
+1. Pick number of clusters `nlist`.
+2. Train k-means on sample vectors.
+3. For each database vector, assign it to nearest centroid.
+4. Store vector ID (and optionally compressed representation) in that centroid's posting list.
+
+The index becomes an "inverted file": each centroid points to a list of members.
+
+## IVF Query Phase
+
+Given query vector $q$:
+
+1. Compute distance from $q$ to all centroids.
+2. Select top `nprobe` nearest centroids.
+3. Scan vectors only in those selected lists.
+4. Return top-$k$ nearest neighbors from scanned candidates.
+
+If `nprobe` is small, speed is high but recall may drop. If `nprobe` is large, recall improves but search gets slower.
+
+## Worked Example (2D for clarity)
+
+Let us build a tiny IVF index.
+
+### Dataset
+
+We have 10 vectors in 2D:
+
+- A(1,1), B(1,2), C(2,1)
+- D(8,8), E(8,9), F(9,8)
+- G(4,4), H(5,4), I(4,5), J(5,5)
+
+Choose `nlist = 3` (three clusters). Imagine k-means gives centroids:
+
+- $c_1=(1.3,1.3)$
+- $c_2=(8.3,8.3)$
+- $c_3=(4.5,4.5)$
+
+Assigned posting lists:
+
+- List 1: A, B, C
+- List 2: D, E, F
+- List 3: G, H, I, J
+
+### Query
+
+Query vector is $q=(4.2,4.8)$, and we want top-2 neighbors.
+
+Distance to centroids (Euclidean):
+
+- $\|q-c_1\| = \sqrt{(4.2-1.3)^2 + (4.8-1.3)^2} = \sqrt{8.41 + 12.25} = \sqrt{20.66} \approx 4.54$
+- $\|q-c_2\| = \sqrt{(4.2-8.3)^2 + (4.8-8.3)^2} = \sqrt{16.81 + 12.25} = \sqrt{29.06} \approx 5.39$
+- $\|q-c_3\| = \sqrt{(4.2-4.5)^2 + (4.8-4.5)^2} = \sqrt{0.09 + 0.09} = \sqrt{0.18} \approx 0.42$
+
+Nearest centroids order: $c_3$, $c_1$, $c_2$.
+
+#### Case 1: `nprobe = 1`
+
+Search only List 3: G, H, I, J.
+
+- $\|q-G(4,4)\| = \sqrt{0.2^2 + 0.8^2} = \sqrt{0.68} \approx 0.825$
+- $\|q-H(5,4)\| = \sqrt{0.8^2 + 0.8^2} = \sqrt{1.28} \approx 1.131$
+- $\|q-I(4,5)\| = \sqrt{0.2^2 + 0.2^2} = \sqrt{0.08} \approx 0.283$
+- $\|q-J(5,5)\| = \sqrt{0.8^2 + 0.2^2} = \sqrt{0.68} \approx 0.825$
+
+Top-2 from scanned set: I, then G (or J tie).
+
+Scanned candidates: 4 vectors.
+
+#### Case 2: `nprobe = 2`
+
+Search List 3 and List 1. Additional distances:
+
+- $\|q-A(1,1)\| = \sqrt{3.2^2 + 3.8^2} = \sqrt{24.68} \approx 4.968$
+- $\|q-B(1,2)\| = \sqrt{3.2^2 + 2.8^2} = \sqrt{18.08} \approx 4.252$
+- $\|q-C(2,1)\| = \sqrt{2.2^2 + 3.8^2} = \sqrt{19.28} \approx 4.391$
+
+Top-2 overall still I and G/J.
+
+Scanned candidates: 7 vectors.
+
+This toy case keeps the same answer, but in real datasets `nprobe` strongly affects recall.
+
+## Complexity View
+
+Rough query cost in IVF:
+
+$$
+O(nlist \cdot d) + O(C \cdot d)
+$$
+
+Where $C$ is number of scanned candidates across `nprobe` lists.
+
+- First term: query-to-centroid distances.
+- Second term: candidate re-ranking.
+
+Well-tuned IVF makes $C \ll N$.
+
+## Key Hyperparameters
+
+### `nlist` (number of clusters)
+
+- Higher `nlist`: smaller posting lists, better pruning, but more centroid comparisons and potentially more memory overhead.
+- Lower `nlist`: larger posting lists, weaker pruning.
+
+Common starting heuristic: choose `nlist` around $\sqrt{N}$, then tune empirically.
+
+### `nprobe` (clusters probed at query time)
+
+- Higher `nprobe`: better recall, slower search.
+- Lower `nprobe`: faster search, lower recall.
+
+Tune `nprobe` per latency budget and target recall.
+
+## IVF Strengths and Weaknesses
+
+Strengths:
+
+- Simple and highly scalable.
+- Good speed/recall trade-off with few knobs.
+- Works very well with quantization methods (for example IVF+PQ).
+
+Weaknesses:
+
+- Cluster quality matters; poor training hurts recall.
+- Boundary points can be missed if `nprobe` is too small.
+- Extra training step compared with flat exact index.
+
+## Practical Tips
+
+1. Train centroids on representative data, not biased samples.
+2. Measure recall@k against exact search on a holdout set.
+3. Tune `nprobe` first for recall, then adjust `nlist` if needed.
+4. Rebuild/retrain if embedding distribution shifts over time.
+
+## Minimal Pseudocode
+
+```text
+build_ivf(vectors, nlist):
+  centroids = kmeans_train(vectors, nlist)
+  lists = [ ]
+  for v in vectors:
+    c = argmin_distance(v, centroids)
+    lists[c].append(v)
+  return centroids, lists
+
+search_ivf(query, centroids, lists, nprobe, k):
+  probe_ids = top_nprobe_nearest_centroids(query, centroids, nprobe)
+  candidates = concat(lists[id] for id in probe_ids)
+  return top_k_by_exact_distance(query, candidates, k)
+```
+
+IVF is often the first serious ANN index to try because it is easy to reason about and tune. Once you understand IVF well, extensions like IVF+PQ become much easier to adopt.

@@ -1,0 +1,223 @@
+---
+heroImage: /src/assets/images/banner.jpg
+category: AI
+description: A detailed guide to Product Quantization (PQ) for compact vector search with a complete worked encoding and distance approximation example.
+pubDate: 2026-07-10T09:10:00.000Z
+draft: false
+tags:
+  - AI
+  - ANN
+  - Vector Search
+  - PQ
+title: Product Quantization (PQ): Compact Vectors and Fast Approximate Distance
+---
+
+Large vector databases create two bottlenecks:
+
+1. Memory footprint of storing high-dimensional float vectors.
+2. Compute cost of distance comparisons during retrieval.
+
+**Product Quantization (PQ)** addresses both by compressing vectors into short codes and estimating distances from those codes.
+
+In this post we cover:
+
+1. PQ intuition
+2. Training and encoding pipeline
+3. A worked numeric example with explicit codebooks
+4. ADC distance computation
+5. Tuning and pitfalls
+
+## Intuition
+
+A 128D float vector (FP32) needs:
+
+$$
+128 \times 4 = 512 \text{ bytes}
+$$
+
+At 100M vectors, that is about 51.2 GB for vectors alone.
+
+PQ splits each vector into sub-vectors, then quantizes each subspace with a small codebook.
+
+- Divide dimension $d$ into $m$ chunks.
+- Train one k-means codebook per chunk.
+- Store one codeword ID per chunk.
+
+If each chunk uses 256 codewords, each ID is 1 byte. Total code length is $m$ bytes.
+
+Example: $m=16$ gives 16 bytes/vector instead of 512 bytes/vector.
+
+## PQ Pipeline
+
+### 1. Split dimensions
+
+For $d=8$ and $m=2$, split each vector into:
+
+- first 4 dims (subspace 1)
+- last 4 dims (subspace 2)
+
+### 2. Train sub-codebooks
+
+Run k-means independently in each subspace.
+
+- Codebook 1: $k$ centroids in subspace 1
+- Codebook 2: $k$ centroids in subspace 2
+
+### 3. Encode database vectors
+
+For each subspace, replace sub-vector by nearest centroid ID.
+
+Stored code for vector is `[id_1, id_2, ..., id_m]`.
+
+### 4. Query-time distance (ADC)
+
+Use **Asymmetric Distance Computation (ADC)**:
+
+- Keep query as float vector.
+- Compare query sub-vectors with centroid tables.
+- Sum lookup-table values for each vector code.
+
+No need to fully decode vectors.
+
+## Worked Example (small but explicit)
+
+Use 4D vectors and $m=2$ (two 2D subspaces). Let each codebook have $k=2$ centroids.
+
+Database vectors:
+
+- $x_1=(1,1, 8,8)$
+- $x_2=(2,1, 9,8)$
+- $x_3=(8,9, 1,2)$
+- $x_4=(9,8, 2,1)$
+
+Split each as:
+
+- subspace A: first 2 dims
+- subspace B: last 2 dims
+
+### Train codebooks (assume learned centroids)
+
+Codebook A (2D):
+
+- $a_0=(1.5,1.0)$
+- $a_1=(8.5,8.5)$
+
+Codebook B (2D):
+
+- $b_0=(8.5,8.0)$
+- $b_1=(1.5,1.5)$
+
+### Encode vectors
+
+For each vector, pick nearest centroid in each subspace.
+
+- $x_1$: A part (1,1) -> $a_0$, B part (8,8) -> $b_0$ => code `[0,0]`
+- $x_2$: A part (2,1) -> $a_0$, B part (9,8) -> $b_0$ => code `[0,0]`
+- $x_3$: A part (8,9) -> $a_1$, B part (1,2) -> $b_1$ => code `[1,1]`
+- $x_4$: A part (9,8) -> $a_1$, B part (2,1) -> $b_1$ => code `[1,1]`
+
+Now each 4D vector is stored as 2 small IDs.
+
+### Query with ADC
+
+Let query be:
+
+$$
+q=(2,2, 8,7)
+$$
+
+Split query:
+
+- $q_A=(2,2)$
+- $q_B=(8,7)$
+
+Build lookup tables (squared L2 distances).
+
+For subspace A:
+
+- $d_A(0)=\|q_A-a_0\|^2=(2-1.5)^2+(2-1.0)^2=0.25+1.00=1.25$
+- $d_A(1)=\|q_A-a_1\|^2=(2-8.5)^2+(2-8.5)^2=42.25+42.25=84.50$
+
+For subspace B:
+
+- $d_B(0)=\|q_B-b_0\|^2=(8-8.5)^2+(7-8.0)^2=0.25+1.00=1.25$
+- $d_B(1)=\|q_B-b_1\|^2=(8-1.5)^2+(7-1.5)^2=42.25+30.25=72.50$
+
+Approximate distance for a vector code `[i,j]`:
+
+$$
+\hat{D}(q, x) = d_A(i) + d_B(j)
+$$
+
+So:
+
+- code `[0,0]`: $1.25 + 1.25 = 2.50$
+- code `[1,1]`: $84.50 + 72.50 = 157.00$
+
+Hence $x_1, x_2$ are much nearer to query than $x_3, x_4$, which matches geometry.
+
+## Why PQ Is Fast
+
+Without PQ, each candidate distance uses many multiply-add operations.
+
+With PQ + ADC:
+
+- Precompute small lookup tables once per query.
+- Per vector, do only $m$ table reads + additions.
+
+This gives large speedups and huge memory savings.
+
+## Important Design Choices
+
+### Number of subquantizers `m`
+
+- Larger `m`: finer representation, longer code, better recall.
+- Smaller `m`: shorter code, more compression, lower recall.
+
+### Codebook size `k`
+
+- Commonly $k=256$ for 8-bit IDs.
+- Larger `k` improves precision but may increase table size and training complexity.
+
+### Preprocessing
+
+PQ works best when dimensions are balanced and less correlated. In practice, people often use OPQ (Optimized PQ), which learns a rotation before splitting dimensions.
+
+## PQ in Real Systems
+
+PQ is often combined with coarse partitioning, yielding IVF+PQ:
+
+1. IVF narrows candidate set.
+2. PQ makes candidate storage and scoring compact.
+
+This combination powers many large-scale vector search systems.
+
+## Caveats
+
+1. Approximate distances can reorder close neighbors.
+2. Poor codebook training hurts recall.
+3. Distribution shift can make old codebooks stale.
+4. Very small datasets may not benefit much from PQ.
+
+## Minimal Pseudocode
+
+```text
+train_pq(vectors, m, k):
+  split vectors into m subspaces
+  for each subspace s:
+    codebook[s] = kmeans(subspace_vectors[s], k)
+  return codebooks
+
+encode_pq(vector, codebooks):
+  for each subspace s:
+    id[s] = nearest_centroid(vector_subspace[s], codebook[s])
+  return id
+
+adc_distance(query, code, codebooks):
+  total = 0
+  for each subspace s:
+    total += distance(query_subspace[s], codebook[s][code[s]])
+  return total
+```
+
+If IVF helps you reduce the number of candidates, PQ helps you store and score those candidates efficiently. Together, they are a practical default for large-scale ANN.

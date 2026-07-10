@@ -1,0 +1,212 @@
+---
+heroImage: /src/assets/images/banner.jpg
+category: AI
+description: A complete guide to HNSW graph indexing for ANN search, with a worked greedy-routing example and practical tuning advice.
+pubDate: 2026-07-10T09:20:00.000Z
+draft: false
+tags:
+  - AI
+  - ANN
+  - Vector Search
+  - HNSW
+title: HNSW Explained: Graph-Based ANN with a Worked Search Walkthrough
+---
+
+HNSW (Hierarchical Navigable Small World) is one of the strongest ANN methods for high recall and low latency. Instead of partitioning vectors into clusters, HNSW builds a multi-layer proximity graph and performs greedy graph traversal.
+
+This post explains:
+
+1. Why graph-based search works
+2. HNSW structure and insertion
+3. Query algorithm with a worked example
+4. Parameter tuning (`M`, `efConstruction`, `efSearch`)
+5. Pros, cons, and production tips
+
+## Why Graph ANN?
+
+Imagine each vector as a node in a graph, connected to nearby vectors. If edges are well chosen, we can "walk" from a random entry point toward the query by repeatedly moving to closer neighbors.
+
+If the graph has both:
+
+- local links (fine navigation), and
+- some long-range shortcuts (global jumps),
+
+search converges quickly.
+
+HNSW adds hierarchy so we can first jump globally at upper sparse layers, then refine in dense lower layers.
+
+## HNSW Structure
+
+HNSW has multiple layers:
+
+- Top layers: very few nodes, long-range navigation.
+- Bottom layer (layer 0): all nodes, dense local neighborhood graph.
+
+Each node is assigned a maximum level (random, exponentially decaying probability), so only some nodes appear in upper layers.
+
+### Key parameters
+
+- `M`: max neighbors per node (roughly graph degree).
+- `efConstruction`: candidate list size during index build.
+- `efSearch`: candidate list size during query.
+
+Higher values usually improve recall but increase memory/build/search costs.
+
+## Insertion (High-Level)
+
+When inserting a new vector:
+
+1. Sample its max layer.
+2. Start from current entry point at top layer.
+3. Greedily descend layers to find a good region.
+4. At each relevant layer, run local best-first search with `efConstruction`.
+5. Connect new node to up to `M` selected neighbors (with diversity heuristic).
+
+This incremental process builds a navigable graph.
+
+## Query Algorithm (High-Level)
+
+Given query $q$:
+
+1. Start at top entry node.
+2. At each upper layer, do greedy walk: move to neighbor if closer to $q$.
+3. When no closer neighbor exists, drop one layer.
+4. At layer 0, run best-first search with candidate heap size `efSearch`.
+5. Return top-$k$ closest visited nodes.
+
+Upper layers provide fast routing; bottom layer provides accurate local refinement.
+
+## Worked Example (Toy Graph)
+
+We use a simplified 2-layer HNSW-like setup in 2D. Distances are Euclidean.
+
+Nodes and coordinates:
+
+- A(1,1), B(2,1), C(2,2), D(8,8), E(9,8), F(8,9), G(5,5)
+
+Layer 1 (sparse): nodes A, G, D
+
+Layer 1 edges:
+
+- A <-> G
+- G <-> D
+
+Layer 0 (dense): all nodes with local edges (simplified):
+
+- A: B, C, G
+- B: A, C, G
+- C: A, B, G
+- G: A, B, C, D, E, F
+- D: G, E, F
+- E: D, F, G
+- F: D, E, G
+
+Assume entry point at top layer is A.
+
+### Query
+
+Query is $q=(8.7,8.4)$.
+
+#### Step 1: Top layer greedy walk
+
+At layer 1:
+
+- Dist to A: $\sqrt{(8.7-1)^2 + (8.4-1)^2} = \sqrt{59.29 + 54.76} = \sqrt{114.05} \approx 10.68$
+- Neighbor G dist: $\sqrt{(8.7-5)^2 + (8.4-5)^2} = \sqrt{13.69 + 11.56} = \sqrt{25.25} \approx 5.02$
+
+Move A -> G.
+
+From G, neighbor D:
+
+- Dist to D: $\sqrt{(8.7-8)^2 + (8.4-8)^2} = \sqrt{0.49 + 0.16} = \sqrt{0.65} \approx 0.81$
+
+Move G -> D.
+
+From D, neighbors at layer 1 are only G (farther), so stop. Descend to layer 0 at node D.
+
+#### Step 2: Layer 0 best-first search (`efSearch = 4` toy)
+
+Initialize candidate set with D.
+
+- Dist(D) = 0.81
+
+Explore D's neighbors E, F, G:
+
+- Dist(E): to E(9,8) => $\sqrt{(8.7-9)^2 + (8.4-8)^2} = \sqrt{0.09 + 0.16} = 0.50$
+- Dist(F): to F(8,9) => $\sqrt{0.49 + 0.36} = \sqrt{0.85} \approx 0.92$
+- Dist(G): about 5.02
+
+Current best candidates include E, D, F, ...
+
+Pop best unexplored (E). Explore E neighbors D, F, G. No dramatically better node appears.
+
+Top nearest results (k=2) are:
+
+1. E (0.50)
+2. D (0.81)
+
+This demonstrates how upper-layer routing quickly moves to the right region, and layer 0 refinement finds local nearest nodes.
+
+## Complexity Intuition
+
+There is no simple exact closed form, but empirically HNSW offers near-logarithmic scaling for search in many real distributions, with very strong recall-latency trade-offs.
+
+Memory is higher than compressed methods because graph edges must be stored.
+
+## Parameter Tuning Guide
+
+### `M`
+
+- Larger `M`: denser graph, better recall, higher memory and build time.
+- Smaller `M`: less memory, potentially lower recall.
+
+Typical range: 12 to 64 depending on scale and recall goals.
+
+### `efConstruction`
+
+- Larger values improve graph quality and final recall.
+- Increases index build time and memory during build.
+
+Often set significantly larger than `M`.
+
+### `efSearch`
+
+- Main online accuracy knob.
+- Higher `efSearch` -> better recall, slower queries.
+- Set based on SLA: tune until recall target is met under latency budget.
+
+## Strengths and Weaknesses
+
+Strengths:
+
+- Excellent recall-latency performance in many scenarios.
+- No separate training stage like IVF centroids (though build is nontrivial).
+- Supports dynamic insertion in many implementations.
+
+Weaknesses:
+
+- Higher memory usage than heavy-compression approaches.
+- Build can be slow for very large datasets.
+- Deletions/updates can be implementation-dependent and complex.
+
+## HNSW vs IVF/PQ (Short View)
+
+- HNSW: often best raw recall/latency, memory heavier.
+- IVF: simple partitioning, great scalability, can miss boundary points if under-probed.
+- PQ: compression method, usually paired with IVF for massive scale.
+
+A common system choice:
+
+- medium scale, high quality: HNSW
+- very large scale with strict memory: IVF+PQ
+
+## Minimal Pseudocode
+
+```text
+search_hnsw(query, entry, top_layer, efSearch, k):
+  node = greedy_descent_from_top(query, entry, top_layer)
+  candidates = best_first_layer0(query, node, efSearch)
+  return top_k(candidates, k)
+```
+
+HNSW is powerful because it uses structure, not just brute-force arithmetic. Once tuned, it often delivers an excellent balance between latency and accuracy for production ANN.
