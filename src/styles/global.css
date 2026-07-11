@@ -21,6 +21,15 @@
 		@apply text-zinc-800 dark:text-zinc-100   !important;
 	}
 
+	.prose pre.shiki,
+	.prose pre.shiki span {
+		background-color: theme(colors.zinc.100) !important;
+	}
+
+	.prose pre.shiki {
+		color: theme(colors.zinc.800) !important;
+	}
+
 	html.dark .shiki,
 	html.dark .shiki span {
 	  color: var(--shiki-dark) !important;
