@@ -1,0 +1,72 @@
+---
+heroImage: https://picsum.photos/seed/meteor-explained/1200/630
+category: AI
+description: 'How METEOR evaluates generated text using alignment, recall, and linguistic matching.'
+pubDate: 2026-07-11T09:30:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Evaluation
+  - METEOR
+title: METEOR Explained for Text Generation
+---
+
+## Why METEOR Was Proposed
+
+METEOR was designed as an alternative to BLEU, especially for machine translation evaluation.
+
+Its creators wanted a metric that aligns better with human judgments by using more than exact n-gram matching. METEOR pays closer attention to recall, word alignment, and flexible matches such as stemming and synonyms.
+
+## What METEOR Looks At
+
+METEOR aligns the generated sentence with the reference sentence using several matching rules:
+
+- exact word matches
+- stem matches
+- synonym matches
+- sometimes paraphrase matches, depending on implementation
+
+After alignment, it computes a score that balances precision and recall, often with more weight on recall than precision.
+
+## Intuition
+
+A simplified form is based on an $F$-score:
+
+$$
+F_{mean} = \frac{10PR}{R + 9P}
+$$
+
+Where $P$ is precision and $R$ is recall.
+
+METEOR then applies a fragmentation penalty so outputs with scattered or badly ordered matches score lower.
+
+## Why It Can Be Better Than BLEU
+
+Consider these two outputs:
+
+Reference:
+
+> the student solved the difficult problem quickly
+
+Generated:
+
+> the pupil quickly solved the hard problem
+
+BLEU may undercount this because the wording changed. METEOR is more forgiving because pupil can align with student and hard can align with difficult.
+
+## Advantages
+
+- Better handling of paraphrases than pure n-gram metrics.
+- Often correlates better with human judgment on short text.
+- Includes ordering penalties through fragmentation.
+
+## Limitations
+
+- More complex to compute than BLEU.
+- Depends on linguistic resources such as stemmers and synonym databases.
+- Still not a full measure of factuality or usefulness.
+
+## When To Use METEOR
+
+METEOR is useful when exact wording is too strict but you still want a reference-based automatic metric. It is especially helpful for translation or captioning setups where meaning-preserving variation should receive some credit.

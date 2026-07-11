@@ -1,0 +1,70 @@
+---
+heroImage: https://picsum.photos/seed/rouge-explained/1200/630
+category: AI
+description: 'A practical introduction to ROUGE for summarization and text generation evaluation.'
+pubDate: 2026-07-11T09:00:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Evaluation
+  - ROUGE
+title: ROUGE Explained for Summarization
+---
+
+## What ROUGE Measures
+
+ROUGE stands for Recall-Oriented Understudy for Gisting Evaluation.
+
+It is a family of overlap-based metrics used heavily in summarization. The main idea is simple: compare a generated summary against one or more reference summaries and measure how much important content overlaps.
+
+Unlike BLEU, which emphasizes precision, ROUGE is usually more recall-oriented. That makes sense for summarization, where missing a key fact is often worse than including a few extra words.
+
+## Common Variants
+
+- ROUGE-1 measures unigram overlap.
+- ROUGE-2 measures bigram overlap.
+- ROUGE-L measures longest common subsequence overlap.
+- ROUGE-S variants measure skip-bigram overlap.
+
+ROUGE-1 and ROUGE-2 are useful for quick lexical coverage checks. ROUGE-L is often preferred when word order and sentence structure matter more.
+
+## Intuition Behind the Score
+
+For a recall-style formulation, the score is roughly:
+
+$$
+\text{ROUGE-N} = \frac{\sum \text{matching } n\text{-grams}}{\sum \text{reference } n\text{-grams}}
+$$
+
+If the reference summary contains ten important unigrams and the model captures eight of them, recall is high even if the model adds a few extra tokens.
+
+## Simple Example
+
+Reference summary:
+
+> The model improved accuracy by using additional training data.
+
+Generated summary:
+
+> The system improved accuracy with more training data.
+
+ROUGE will reward the shared content words like improved, accuracy, and training data, even if some wording differs.
+
+## Strengths
+
+- Easy to compute and easy to compare across systems.
+- Useful when reference summaries are available.
+- Still a standard baseline in summarization papers.
+
+## Limitations
+
+- It is surface-form based, so paraphrases may be under-rewarded.
+- High overlap does not always mean the summary is faithful.
+- Low overlap does not always mean the summary is bad, especially for abstractive systems.
+
+This is why ROUGE is often paired with human evaluation or semantic metrics such as BERTScore.
+
+## When To Use ROUGE
+
+ROUGE is most useful when you need a stable, reproducible baseline for summarization or headline generation. It is less reliable as the only metric for modern LLM outputs, but it remains a strong first pass for comparing systems quickly.

@@ -1,0 +1,69 @@
+---
+heroImage: https://picsum.photos/seed/bleu-explained/1200/630
+category: AI
+description: 'A practical guide to BLEU, n-gram precision, and why it still matters in NLP.'
+pubDate: 2026-07-11T09:10:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Evaluation
+  - BLEU
+title: BLEU Explained for Machine Translation
+---
+
+## What BLEU Is
+
+BLEU stands for Bilingual Evaluation Understudy.
+
+It is one of the oldest and most widely cited automatic metrics for machine translation. BLEU compares model output against one or more reference translations using modified n-gram precision.
+
+The core question is: how much of the generated text matches phrases that a human translator would use?
+
+## How BLEU Works
+
+BLEU checks unigram, bigram, trigram, and 4-gram matches, then combines them using a geometric mean. It also applies a brevity penalty so a system cannot score well by generating very short outputs.
+
+In simplified form:
+
+$$
+\text{BLEU} = \text{BP} \cdot \exp\left(\sum_{n=1}^{N} w_n \log p_n\right)
+$$
+
+Where:
+
+- $p_n$ is modified precision for $n$-grams.
+- $w_n$ is the weight for each $n$-gram order.
+- BP is the brevity penalty.
+
+## Why Modified Precision Matters
+
+Suppose the reference says:
+
+> the cat is on the mat
+
+If a system outputs:
+
+> the the the the the mat
+
+Naive precision would incorrectly reward repeated words. BLEU avoids that by clipping counts based on the reference.
+
+## Strengths
+
+- Fast and standardized.
+- Good for comparing systems on the same translation dataset.
+- Historically important, so it is easy to place results in context.
+
+## Weaknesses
+
+- It is not very sensitive to meaning-preserving paraphrases.
+- Sentence-level BLEU can be unstable.
+- Strong BLEU does not guarantee fluent or faithful translation.
+
+Modern models can produce outputs that humans prefer even when BLEU barely changes.
+
+## When BLEU Still Helps
+
+BLEU is still useful when you need a reproducible benchmark for translation or controlled generation tasks. It is best treated as one metric among several, not the sole judge of quality.
+
+For production systems, pair BLEU with human review or semantic metrics so you measure both surface agreement and actual meaning.

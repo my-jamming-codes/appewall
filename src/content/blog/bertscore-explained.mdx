@@ -1,0 +1,65 @@
+---
+heroImage: https://picsum.photos/seed/bertscore-explained/1200/630
+category: AI
+description: 'How BERTScore measures semantic similarity beyond exact token overlap.'
+pubDate: 2026-07-11T09:50:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Evaluation
+  - BERTScore
+title: BERTScore Explained for Semantic Evaluation
+---
+
+## Why BERTScore Exists
+
+Traditional metrics like BLEU and ROUGE focus on exact word overlap. That can be too strict for modern text generation, where a good answer may use different wording while preserving meaning.
+
+BERTScore addresses this by comparing contextual embeddings instead of raw surface tokens.
+
+## Core Idea
+
+Each token in the candidate and reference text is embedded using a transformer model such as BERT. Tokens are then matched by cosine similarity rather than exact string equality.
+
+This allows semantically similar words to receive partial credit.
+
+## Intuition
+
+If the reference says:
+
+> the car accelerated rapidly
+
+and the candidate says:
+
+> the vehicle sped up quickly
+
+BLEU or ROUGE may give limited credit. BERTScore can capture that car and vehicle, or rapidly and quickly, are close in meaning.
+
+## Simplified View of the Computation
+
+For each token, BERTScore finds the most similar token in the other sentence using cosine similarity:
+
+$$
+\text{sim}(x, y) = \frac{x \cdot y}{\lVert x \rVert \lVert y \rVert}
+$$
+
+It then aggregates these similarities into precision, recall, and F1-style scores.
+
+## Advantages
+
+- Better handling of paraphrases.
+- Often stronger correlation with human judgments.
+- Useful for summarization, translation, captioning, and open-ended generation.
+
+## Limitations
+
+- More computationally expensive than lexical metrics.
+- Sensitive to the underlying encoder model.
+- Semantic similarity does not guarantee factual correctness.
+
+An answer can sound semantically close while still hallucinating an important detail.
+
+## When To Use BERTScore
+
+BERTScore is useful when exact wording is not the real target and meaning matters more than surface overlap. In modern LLM evaluation, it is a strong complement to ROUGE, BLEU, and human review.

@@ -1,0 +1,61 @@
+---
+heroImage: https://picsum.photos/seed/mmlu-explained/1200/630
+category: AI
+description: 'A concise guide to MMLU and what it does, and does not, tell you about LLMs.'
+pubDate: 2026-07-11T09:40:00.000Z
+draft: false
+tags:
+  - AI
+  - LLM
+  - Evaluation
+  - MMLU
+title: MMLU Explained for LLM Benchmarking
+---
+
+## What MMLU Is
+
+MMLU stands for Massive Multitask Language Understanding.
+
+It is a broad benchmark used to test language models across many subjects, including mathematics, history, law, medicine, and computer science. The benchmark is usually framed as multiple-choice question answering.
+
+The goal is to measure whether a model can apply knowledge across domains rather than overfit to one narrow task.
+
+## Why MMLU Became Popular
+
+MMLU gives researchers a single headline number that summarizes broad academic-style knowledge performance. That made it useful for comparing foundation models during the rapid growth of LLMs.
+
+If one model scores much higher than another on MMLU, it usually suggests stronger factual coverage and reasoning under benchmark conditions.
+
+## What It Measures Well
+
+- broad subject coverage
+- closed-book knowledge recall
+- multiple-choice reasoning under standard conditions
+
+Because the format is consistent, MMLU is easy to compare across papers.
+
+## What It Does Not Measure Well
+
+- long-form generation quality
+- tool use
+- agent behavior
+- factuality in open-ended outputs
+- safety and instruction following
+
+A model can score well on MMLU and still struggle in realistic product settings.
+
+## How Scores Are Reported
+
+The main metric is usually accuracy:
+
+$$
+\text{Accuracy} = \frac{\text{correct answers}}{\text{total questions}}
+$$
+
+That simplicity is useful, but it also means the benchmark hides where the model succeeds or fails by subject.
+
+## Practical Reading of MMLU
+
+Treat MMLU as a strong snapshot of broad benchmark knowledge, not as a complete model evaluation. It is most informative when paired with task-specific tests that reflect the actual use case.
+
+For example, if you are building a coding assistant, MMLU matters less than code generation correctness, tool use, and failure recovery.
