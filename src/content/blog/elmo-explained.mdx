@@ -1,0 +1,67 @@
+---
+heroImage: https://picsum.photos/seed/elmo-explained/1200/630
+category: AI
+description: 'How ELMo introduced contextual word representations before the transformer era.'
+pubDate: 2026-07-11T10:50:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Embeddings
+  - ELMo
+title: ELMo Explained for Contextual Embeddings
+---
+
+## What ELMo Is
+
+ELMo stands for Embeddings from Language Models.
+
+It introduced contextual word embeddings, meaning a word's vector representation changes depending on the sentence it appears in. That was a major improvement over static embeddings like Word2Vec or GloVe.
+
+## Why Context Matters
+
+Consider the word bank in these two sentences:
+
+- She sat on the bank of the river.
+- He deposited cash in the bank.
+
+Static embeddings assign bank one vector. ELMo produces different representations because the surrounding context changes the meaning.
+
+## How ELMo Works
+
+ELMo is built from deep bidirectional language models, typically stacked recurrent layers trained to predict words from left and right context.
+
+The final representation for a token is a learned combination of internal states from different layers.
+
+In simplified form:
+
+$$
+\text{ELMo}_t = \gamma \sum_{j=0}^{L} s_j h_{t,j}
+$$
+
+Where:
+
+- $h_{t,j}$ is the representation of token $t$ at layer $j$
+- $s_j$ is a learned weight for each layer
+- $\gamma$ rescales the final embedding
+
+## Why ELMo Was Important
+
+ELMo showed that pretrained contextual representations could significantly improve downstream tasks like question answering, named entity recognition, and sentiment analysis.
+
+It helped shift NLP away from static word lookup and toward contextual pretraining.
+
+## Strengths
+
+- Handles polysemy much better than static embeddings.
+- Uses both left and right context.
+- Improved a wide range of NLP tasks before transformers took over.
+
+## Limitations
+
+- Based on recurrent computation, so it is slower and less parallel than transformer architectures.
+- Later models like BERT provided even stronger contextual representations.
+
+## Why ELMo Still Matters
+
+ELMo is a key milestone in NLP history. It sits between classic static embeddings and fully transformer-based pretraining, and it explains why contextual representation learning changed the field so quickly.

@@ -1,0 +1,59 @@
+---
+heroImage: https://picsum.photos/seed/rnn-explained/1200/630
+category: AI
+description: 'A practical introduction to recurrent neural networks and sequential modeling.'
+pubDate: 2026-07-11T10:20:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Neural Networks
+  - RNN
+title: RNN Explained for Sequence Modeling
+---
+
+## What an RNN Is
+
+RNN stands for Recurrent Neural Network.
+
+It is a neural architecture designed for sequential data, where the current step depends not only on the current input but also on what came before. That made RNNs an early standard for language modeling, speech processing, and time-series prediction.
+
+Unlike a plain feedforward network, an RNN carries a hidden state forward through the sequence.
+
+## Core Intuition
+
+At time step $t$, the network reads an input $x_t$ and combines it with the previous hidden state $h_{t-1}$ to produce a new hidden state $h_t$.
+
+$$
+h_t = f(W_x x_t + W_h h_{t-1} + b)
+$$
+
+This recurrence lets the model store a compressed memory of earlier tokens or observations.
+
+## Why RNNs Were Important
+
+Before transformers became dominant, RNNs were one of the main ways to model ordered context. They helped make tasks like next-word prediction and sequence labeling more effective than fixed-window methods.
+
+For example, in the sentence:
+
+> The cat that chased the bird was hungry.
+
+the meaning of each word depends on earlier words. RNNs were built to process data in that left-to-right order.
+
+## Strengths
+
+- Naturally suited to ordered inputs.
+- Parameter sharing across time steps keeps the model compact.
+- Useful for text, audio, and time-series data.
+
+## Main Limitation
+
+Standard RNNs struggle with long-range dependencies. As sequences get longer, the model can forget early information because gradients either vanish or explode during training.
+
+That problem led to improved recurrent architectures such as LSTM and GRU.
+
+## Where RNNs Still Matter
+
+RNNs are no longer the default choice for large-scale language models, but they remain useful for learning sequence fundamentals and for some smaller or streaming tasks where simple recurrent computation is enough.
+
+Understanding RNNs also makes it easier to understand why later models like LSTMs and transformers were such important improvements.

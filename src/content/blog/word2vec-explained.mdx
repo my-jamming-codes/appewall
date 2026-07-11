@@ -1,0 +1,68 @@
+---
+heroImage: https://picsum.photos/seed/word2vec-explained/1200/630
+category: AI
+description: 'How Word2Vec learns dense vector representations that capture word meaning.'
+pubDate: 2026-07-11T10:40:00.000Z
+draft: false
+tags:
+  - AI
+  - NLP
+  - Embeddings
+  - Word2Vec
+title: Word2Vec Explained for Word Embeddings
+---
+
+## What Word2Vec Is
+
+Word2Vec is a family of methods for learning dense vector representations of words.
+
+Instead of representing each word as a sparse one-hot vector, Word2Vec learns embeddings where semantically related words end up close together in vector space.
+
+This was a major step forward for NLP because it gave models a much richer representation of meaning.
+
+## The Main Idea
+
+Word2Vec relies on the distributional hypothesis:
+
+> words that appear in similar contexts tend to have similar meanings
+
+If two words often occur near the same surrounding words, the model learns similar embeddings for them.
+
+## Two Common Training Setups
+
+- CBOW predicts a target word from its surrounding context.
+- Skip-gram predicts surrounding context words from a target word.
+
+Both approaches learn vectors as a byproduct of solving a prediction task.
+
+## Why the Embeddings Matter
+
+Once trained, each word has a dense vector such as:
+
+$$
+\text{word} \rightarrow \mathbf{v} \in \mathbb{R}^d
+$$
+
+These vectors often capture meaningful relationships. A famous example is:
+
+$$
+\text{king} - \text{man} + \text{woman} \approx \text{queen}
+$$
+
+That kind of structure helped make embeddings widely useful across NLP systems.
+
+## Strengths
+
+- Efficient to train.
+- Produces compact and useful word vectors.
+- Works well as a general-purpose representation for many downstream tasks.
+
+## Limitations
+
+- Each word gets one fixed vector regardless of context.
+- Polysemous words like bank are hard to model well.
+- Contextual models such as ELMo and BERT are more expressive.
+
+## Why Word2Vec Still Matters
+
+Word2Vec remains one of the clearest introductions to embeddings. It explains the transition from symbolic word lookup to learned vector representations, which later became central to modern NLP and LLM systems.
