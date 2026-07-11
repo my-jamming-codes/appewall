@@ -1,0 +1,161 @@
+---
+heroImage: https://picsum.photos/seed/logitsprocessor-hf/1200/630
+category: AI
+description: 'How LogitsProcessor works in Hugging Face Transformers, with custom processors and practical generation control examples.'
+pubDate: 2026-07-11T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Transformers
+  - Hugging Face
+title: LogitsProcessor In Hugging Face Transformers
+---
+
+## Why LogitsProcessor Matters
+
+During text generation, a language model outputs logits for the next token.
+
+A `LogitsProcessor` lets you modify those logits before sampling or argmax happens.
+
+This is one of the cleanest ways to enforce decoding behavior without retraining the model.
+
+Typical use cases:
+
+- Avoid repetitive loops.
+- Block unsafe or forbidden tokens.
+- Bias style or domain vocabulary.
+- Enforce simple format constraints.
+
+## Where It Sits In The Generation Loop
+
+A simplified generation step looks like this:
+
+1. Model predicts next-token logits.
+2. `LogitsProcessorList` transforms logits.
+3. Optional warpers (temperature, top-k, top-p) adjust sampling distribution.
+4. Decoder picks next token.
+
+If $z$ is the raw logit vector and $f$ is the processor pipeline:
+
+$$
+z' = f(z)
+$$
+
+Then probabilities are computed from $z'$.
+
+## Built-In Processors You Should Know
+
+Hugging Face includes several useful processors:
+
+- `NoRepeatNGramLogitsProcessor`: discourages repeated n-grams.
+- `MinLengthLogitsProcessor`: prevents early EOS.
+- `RepetitionPenaltyLogitsProcessor`: penalizes repeated tokens.
+- `ForcedBOSTokenLogitsProcessor` and `ForcedEOSTokenLogitsProcessor`.
+
+You can combine them in a `LogitsProcessorList`.
+
+## Basic Example With Generate
+
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import LogitsProcessorList, MinLengthLogitsProcessor
+import torch
+
+model_id = "gpt2"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
+model.eval()
+
+prompt = "Write a concise explanation of self-attention:"
+inputs = tokenizer(prompt, return_tensors="pt")
+
+processors = LogitsProcessorList([
+    MinLengthLogitsProcessor(min_length=40, eos_token_id=tokenizer.eos_token_id),
+])
+
+with torch.no_grad():
+    output_ids = model.generate(
+        **inputs,
+        max_new_tokens=80,
+        do_sample=True,
+        top_p=0.9,
+        temperature=0.8,
+        logits_processor=processors,
+    )
+
+print(tokenizer.decode(output_ids[0], skip_special_tokens=True))
+```
+
+## Writing A Custom LogitsProcessor
+
+Custom processors subclass `LogitsProcessor` and implement `__call__(input_ids, scores)`.
+
+`scores` has shape `[batch_size, vocab_size]` and is modified in-place or returned as a new tensor.
+
+```python
+from transformers import LogitsProcessor
+import torch
+
+class BanTokensProcessor(LogitsProcessor):
+    def __init__(self, banned_token_ids):
+        self.banned_token_ids = banned_token_ids
+
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor):
+        scores[:, self.banned_token_ids] = -float("inf")
+        return scores
+```
+
+Attach it:
+
+```python
+banned = tokenizer.convert_tokens_to_ids([" bad", " toxic"])
+processors = LogitsProcessorList([BanTokensProcessor(banned)])
+
+output_ids = model.generate(
+    **inputs,
+    max_new_tokens=60,
+    do_sample=True,
+    logits_processor=processors,
+)
+```
+
+## Example: Soft Bias Instead Of Hard Ban
+
+Hard bans can degrade fluency. A softer strategy is subtracting a penalty instead of $-\infty$.
+
+```python
+class SoftPenaltyProcessor(LogitsProcessor):
+    def __init__(self, token_ids, penalty=3.0):
+        self.token_ids = token_ids
+        self.penalty = penalty
+
+    def __call__(self, input_ids, scores):
+        scores[:, self.token_ids] -= self.penalty
+        return scores
+```
+
+This keeps tokens possible but less likely.
+
+## Practical Pitfalls
+
+1. Over-constraining logits can produce degenerate outputs.
+2. Tokenization details matter; words may split into multiple token IDs.
+3. Processors run every step, so expensive logic can hurt latency.
+4. Validate behavior across prompts, not only one happy path.
+
+## Minimal Pseudocode
+
+```plaintext
+for t in range(max_steps):
+  logits = model(next_input)
+  logits = logits_processors(input_ids, logits)
+  logits = logits_warpers(input_ids, logits)
+  next_token = sample_or_greedy(logits)
+  append(next_token)
+```
+
+## Takeaway
+
+`LogitsProcessor` is a practical control layer between model prediction and decoding decision.
+
+It is often the fastest path to safer or more structured generation behavior in production systems.

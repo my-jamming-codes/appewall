@@ -1,0 +1,154 @@
+---
+heroImage: https://picsum.photos/seed/structured-decoding/1200/630
+category: AI
+description: 'Structured decoding explained with JSON and grammar-constrained generation examples for reliable LLM outputs.'
+pubDate: 2026-07-11T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Structured Decoding
+  - LLM Engineering
+title: Structured Decoding With Examples
+---
+
+## What Is Structured Decoding?
+
+Structured decoding means constraining token generation so model output follows a target format.
+
+Instead of hoping the model returns valid JSON, XML, SQL, or a schema object, decoding rules enforce it token by token.
+
+## Why Teams Use It
+
+Structured output reduces downstream parsing failures and makes integrations safer.
+
+Common scenarios:
+
+- API responses that must match a JSON schema.
+- Tool-calling arguments with strict field types.
+- Data extraction pipelines that require guaranteed keys.
+- Agent systems where malformed output breaks execution.
+
+## Core Idea
+
+At each decoding step, only a subset of tokens is valid under the current partial output state.
+
+If $V_t$ is the full vocabulary at step $t$ and $A_t \subseteq V_t$ are allowed tokens, then constrained decoding masks all tokens not in $A_t$.
+
+$$
+\tilde{z}_i =
+\begin{cases}
+z_i, & i \in A_t \\
+-\infty, & i \notin A_t
+\end{cases}
+$$
+
+This guarantees generated text stays on a valid path.
+
+## Example 1: JSON Object With Fixed Keys
+
+Suppose required output is:
+
+```json
+{
+	"label": "...",
+	"score": 0.0
+}
+```
+
+A constrained decoder can enforce:
+
+1. Opening `{` first.
+2. Key names in expected order or any order allowed by grammar.
+3. Numeric token pattern for `score`.
+4. Proper commas, quotes, and closing braces.
+
+## Example 2: Pydantic/JSON Schema Style Flow
+
+```python
+# high-level pseudo-interface
+schema = {
+  "type": "object",
+  "properties": {
+    "intent": {"type": "string", "enum": ["buy", "sell", "hold"]},
+    "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+  },
+  "required": ["intent", "confidence"],
+  "additionalProperties": False
+}
+
+result = constrained_generate(
+    model=model,
+    tokenizer=tokenizer,
+    prompt="Classify this message and output JSON.",
+    json_schema=schema,
+)
+
+print(result)
+# Always valid object with required fields
+```
+
+Different libraries implement this differently, but the principle is the same: grammar/state machine + token masking.
+
+## Example 3: Grammar-Constrained Command Generation
+
+Assume we only allow commands from:
+
+```plaintext
+COMMAND := "SEARCH" "(" QUERY ")"
+QUERY   := STRING
+```
+
+Then outputs like `DELETE(/)` become impossible because tokens for invalid productions are masked.
+
+This is useful for safe tool invocation and sandboxed automation.
+
+## Lightweight Implementation Pattern
+
+A common implementation has these parts:
+
+1. A parser state tracking what tokens are valid next.
+2. A function that maps parser state to allowed token IDs.
+3. A logits mask that sets disallowed token logits to $-\infty$.
+
+```python
+def apply_mask(scores, allowed_token_ids):
+    mask = torch.full_like(scores, float("-inf"))
+    mask[:, allowed_token_ids] = 0.0
+    return scores + mask
+```
+
+## Trade-Offs
+
+Structured decoding improves reliability but adds constraints that can reduce fluency if schema is too rigid.
+
+Typical trade-offs:
+
+- Higher correctness, lower malformed output.
+- Slightly higher latency due to parser/mask computation.
+- Potentially less expressive free-form responses.
+
+## Practical Tips
+
+1. Keep schemas minimal and task-specific.
+2. Validate semantically after syntactic validation.
+3. Log rejected token counts for observability.
+4. Provide fallback paths if constraints are impossible for a prompt.
+
+## Minimal Pseudocode
+
+```plaintext
+state = grammar.start()
+for t in range(max_steps):
+  logits = model(input_ids)
+  allowed = grammar.allowed_tokens(state)
+  logits = mask_disallowed(logits, allowed)
+  token = sample(logits)
+  state = grammar.consume(state, token)
+  append(token)
+```
+
+## Takeaway
+
+Structured decoding turns format adherence from a prompt-level hope into a decoding-time guarantee.
+
+For production LLM systems that must return machine-readable output, it is one of the highest-leverage techniques you can adopt.
