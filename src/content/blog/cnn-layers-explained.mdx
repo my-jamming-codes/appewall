@@ -1,0 +1,131 @@
+---
+heroImage: https://picsum.photos/seed/cnn-layers/1200/630
+category: AI
+description: 'A clear walkthrough of common CNN layers and how feature maps evolve through the network.'
+pubDate: 2026-07-11T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - CNN
+  - Computer Vision
+title: CNN Layers Explained
+---
+
+## What A CNN Learns
+
+A Convolutional Neural Network (CNN) learns spatial patterns from grid-like data such as images.
+
+Early layers usually detect edges and textures, while deeper layers capture higher-level structures like parts and objects.
+
+## Core CNN Layer Types
+
+Most CNNs combine a few key layer families:
+
+1. Convolution layers for feature extraction.
+2. Activation functions for nonlinearity.
+3. Pooling or strided operations for downsampling.
+4. Normalization and regularization layers.
+5. Dense or projection heads for prediction.
+
+## Convolution Layer
+
+A convolution layer slides learnable kernels across input channels to produce feature maps.
+
+For one output position, it computes weighted sums over a local receptive field.
+
+A simple expression for one output channel is:
+
+$$
+Y_{i,j} = \sum_{u,v,c} W_{u,v,c} \cdot X_{i+u, j+v, c} + b
+$$
+
+Key hyperparameters:
+
+- Kernel size (for example $3 \times 3$ or $5 \times 5$)
+- Stride
+- Padding
+- Number of output channels
+
+## Activation Layer
+
+After convolution, activations such as ReLU are applied element-wise:
+
+$$
+\text{ReLU}(x) = \max(0, x)
+$$
+
+This introduces nonlinearity so the network can model complex patterns.
+
+## Pooling Layer
+
+Pooling reduces spatial resolution and increases translation robustness.
+
+Common choices:
+
+- Max pooling: keeps the strongest local response.
+- Average pooling: keeps average local response.
+
+Downsampling also reduces compute in later layers.
+
+## Batch Normalization
+
+Batch normalization stabilizes training by normalizing intermediate activations.
+
+It often enables faster convergence and allows higher learning rates.
+
+In practice, a common pattern is `Conv -> BatchNorm -> ReLU`.
+
+## Dropout And Regularization
+
+Dropout randomly zeroes activations during training to reduce co-adaptation and overfitting.
+
+Weight decay and data augmentation are also common regularization methods in CNN pipelines.
+
+## Receptive Field Growth
+
+Stacking multiple small kernels (for example several $3 \times 3$ layers) increases effective receptive field while keeping parameter efficiency.
+
+Deeper layers aggregate broader context than early layers.
+
+## Classifier Head
+
+After feature extraction, models often use:
+
+1. Global average pooling to collapse spatial dimensions.
+2. One or more dense layers.
+3. A final softmax or sigmoid output layer.
+
+For multi-class classification:
+
+$$
+\hat{y} = \text{softmax}(z)
+$$
+
+## Minimal Pseudocode
+
+```plaintext
+x = conv3x3(input, out_channels=64, stride=1, padding=1)
+x = batch_norm(x)
+x = relu(x)
+x = max_pool(x, kernel=2, stride=2)
+
+x = conv3x3(x, out_channels=128, stride=1, padding=1)
+x = batch_norm(x)
+x = relu(x)
+
+x = global_avg_pool(x)
+logits = linear(x, num_classes)
+```
+
+## Practical Tips
+
+1. Start with a simple baseline before adding depth.
+2. Use data augmentation aggressively for vision tasks.
+3. Track both train and validation metrics to detect overfitting.
+4. Prefer modern blocks (residual connections) when scaling deeper networks.
+
+## Takeaway
+
+CNN layers form a progression from local edge detection to high-level semantic representation.
+
+Understanding each layer's role makes architecture design and debugging much easier.

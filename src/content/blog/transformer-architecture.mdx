@@ -1,0 +1,133 @@
+---
+heroImage: https://picsum.photos/seed/transformer-architecture/1200/630
+category: AI
+description: 'A practical guide to Transformer architecture, from self-attention to encoder-decoder design.'
+pubDate: 2026-07-11T00:00:00.000Z
+draft: false
+tags:
+  - AI
+  - Transformers
+  - Attention
+title: Transformer Architecture Explained
+---
+
+## Why Transformers Matter
+
+Transformer models changed deep learning by replacing recurrence with attention.
+
+Instead of processing tokens one by one in sequence like an RNN, Transformers process tokens in parallel and let each token attend to other tokens.
+
+This makes training faster and often improves quality on language, vision, and multimodal tasks.
+
+## High-Level Building Blocks
+
+A Transformer is built from repeated blocks.
+
+The classic architecture has:
+
+1. An encoder stack.
+2. A decoder stack.
+3. Attention layers and feed-forward layers inside each block.
+4. Residual connections and layer normalization for stable optimization.
+
+Many modern LLMs use decoder-only Transformers, but the core ideas are the same.
+
+## Input Embeddings And Position Information
+
+Tokens are mapped into vectors using an embedding matrix.
+
+Because attention itself is permutation-invariant, we add position information so the model can represent order.
+
+Common approaches:
+
+- Learned positional embeddings.
+- Sinusoidal positional encodings.
+- Relative position schemes.
+
+## Self-Attention Intuition
+
+In self-attention, each token produces:
+
+- Query vector $Q$
+- Key vector $K$
+- Value vector $V$
+
+A token compares its query with all keys, obtains attention weights, and forms a weighted sum of values.
+
+The scaled dot-product attention equation is:
+
+$$
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
+
+The scale factor $\sqrt{d_k}$ prevents large dot products from pushing softmax into unstable extremes.
+
+## Multi-Head Attention
+
+A single attention map is often too limited.
+
+Multi-head attention runs attention several times in parallel with different learned projections, then concatenates and projects the result.
+
+This allows different heads to capture different relations such as syntax, long-range dependency, or entity reference.
+
+## Feed-Forward Network (FFN)
+
+After attention, each token passes through a position-wise MLP:
+
+$$
+\text{FFN}(x) = W_2\sigma(W_1x + b_1) + b_2
+$$
+
+Where $\sigma$ is typically GELU or ReLU.
+
+This stage adds nonlinearity and feature transformation per token.
+
+## Residuals And LayerNorm
+
+Each sublayer uses skip connections and normalization:
+
+$$
+y = \text{LayerNorm}(x + \text{Sublayer}(x))
+$$
+
+Residual paths help gradient flow, while normalization improves training stability.
+
+## Encoder-Decoder Attention
+
+In encoder-decoder Transformers, decoder layers use two attention types:
+
+1. Masked self-attention over generated tokens.
+2. Cross-attention over encoder outputs.
+
+Masked attention prevents peeking at future tokens during training.
+
+## Complexity Note
+
+Self-attention cost for sequence length $n$ is roughly $O(n^2)$ in compute and memory for the attention matrix.
+
+That is powerful for global context but can be expensive on long sequences.
+
+This is why long-context variants use sparse attention, chunking, or memory-efficient kernels.
+
+## Minimal Pseudocode
+
+```plaintext
+for block in transformer_blocks:
+  x = layer_norm(x + multi_head_attention(x))
+  x = layer_norm(x + feed_forward(x))
+
+logits = output_projection(x)
+```
+
+## Practical Tips
+
+1. Start with proven defaults for hidden size, heads, and FFN expansion ratio.
+2. Use mixed precision and gradient checkpointing for larger contexts.
+3. Monitor attention entropy and validation loss to catch collapse early.
+4. Tokenization quality strongly affects downstream performance.
+
+## Takeaway
+
+Transformer architecture combines parallel processing, attention-based context mixing, and stable optimization patterns.
+
+That combination is why it became the default backbone for modern AI systems.
